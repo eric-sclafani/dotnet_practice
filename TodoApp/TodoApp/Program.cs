@@ -36,7 +36,10 @@ internal class Program
                     "Edit Todo",
                     "Delete Todo",
                     "Exit"
-                ]));
+                ])
+                .EnableSearch()
+                
+            );
         return userInput;
     }
 }

@@ -6,11 +6,10 @@ using Models;
 
 public class TodoManager
 {
-    private List<Todo> _todos = [];
+    private readonly List<Todo> _todos = [];
 
     public void InterpretUserInput(string input)
     {
-        AnsiConsole.MarkupLine($"\nYou've chosen to [aqua]{input}[/].");
         switch (input)
         {
             case "Add New Todo":
@@ -18,14 +17,14 @@ public class TodoManager
                 break;
 
             case "View All Todos":
-
+                View();
                 break;
             case "Edit Todo":
-
+                Edit();
                 break;
 
             case "Delete Todo":
-
+                Delete();
                 break;
 
             case "Exit":
@@ -37,24 +36,38 @@ public class TodoManager
     private void Add()
     {
         var todo = new Todo();
-        DisplayRule("Description");
         var desc = AnsiConsole.Prompt(new TextPrompt<string>("Enter Todo Description:"));
-
         var dueDate = AnsiConsole.Prompt(
             new TextPrompt<DateOnly?>("Enter Due Date (MM/DD/YYYY or leave blank):")
-                .AllowEmpty()
                 .DefaultValue(null)
                 .ShowDefaultValue(false)
         );
 
         todo.Description = desc;
-        todo.DueDate = dueDate;
+        todo.DueDate = dueDate.ToString() != "" ? dueDate.ToString() : null;
         _todos.Add(todo);
-        AnsiConsole.MarkupLine("\n[green]Success![/] Added your new todo item.");
+        View();
     }
 
     private void View()
     {
+        var table = new Table
+        {
+            Title = new TableTitle("Todos")
+        };
+        table.AddColumns([
+            new TableColumn("Description"),
+            new TableColumn("Due Date")
+        ]);
+
+        foreach (var todo in _todos)
+        {
+            table.AddRow(todo.Description, todo.DueDate ?? "NA");
+        }
+
+        Console.WriteLine();
+        AnsiConsole.Write(table);
+        Console.WriteLine();
     }
 
     private void Edit()
@@ -63,13 +76,5 @@ public class TodoManager
 
     private void Delete()
     {
-    }
-
-    private static void DisplayRule(string text)
-    {
-        var rule = new Rule($"[red]{text}[/]");
-        rule.LeftJustified();
-        Console.WriteLine();
-        AnsiConsole.Write(rule);
     }
 }
