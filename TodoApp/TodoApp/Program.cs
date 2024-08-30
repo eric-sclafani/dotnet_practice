@@ -34,6 +34,7 @@ internal class Program
                     "Add New Todo",
                     "View All Todos",
                     "Edit Todo",
+                    "Mark Completed",
                     "Delete Todo",
                     "Exit"
                 ])

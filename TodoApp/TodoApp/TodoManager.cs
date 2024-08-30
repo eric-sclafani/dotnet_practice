@@ -1,4 +1,5 @@
 using Spectre.Console;
+using Spectre.Console.Rendering;
 
 namespace TodoApp;
 
@@ -19,8 +20,13 @@ public class TodoManager
             case "View All Todos":
                 View();
                 break;
+
             case "Edit Todo":
                 Edit();
+                break;
+
+            case "Mark Completed":
+                MarkCompleted();
                 break;
 
             case "Delete Todo":
@@ -44,33 +50,56 @@ public class TodoManager
         );
 
         todo.Description = desc;
-        todo.DueDate = dueDate.ToString() != "" ? dueDate.ToString() : null;
+        todo.DueDate = dueDate.ToString();
         _todos.Add(todo);
-        View();
     }
 
     private void View()
     {
-        var table = new Table
-        {
-            Title = new TableTitle("Todos")
-        };
-        table.AddColumns([
-            new TableColumn("Description"),
-            new TableColumn("Due Date")
+        var grid = new Grid();
+        grid.AddColumns(3);
+        grid.AddRow([
+            new Text("Completed", new Style(Color.Red, Color.Black)).LeftJustified(),
+            new Text("Description", new Style(Color.Green, Color.Black)).Centered(),
+            new Text("Due date", new Style(Color.Blue, Color.Black)).RightJustified()
         ]);
 
         foreach (var todo in _todos)
         {
-            table.AddRow(todo.Description, todo.DueDate ?? "NA");
+            grid.AddRow(
+                new Text(todo.IsCompleted ? "[X]" : "[ ]"),
+                new Text(todo.Description),
+                new Text(todo.DueDate)
+            );
         }
 
-        Console.WriteLine();
-        AnsiConsole.Write(table);
-        Console.WriteLine();
+        var panel = new Panel(grid)
+        {
+            Border = BoxBorder.Heavy
+        };
+        panel.Expand();
+        AnsiConsole.Write(panel);
     }
 
     private void Edit()
+    {
+        if (_todos.Count > 0)
+        {
+            var selection = AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                    .AddChoices(_todos.Select((todo) => todo.Description))
+                    .Mode(SelectionMode.Independent)
+            );
+
+            Console.WriteLine($"You chose {selection}");
+        }
+        else
+        {
+            Console.WriteLine("\nYou have no todos to edit.\n");
+        }
+    }
+
+    private void MarkCompleted()
     {
     }
 
