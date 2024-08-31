@@ -1,5 +1,4 @@
 using Spectre.Console;
-using Spectre.Console.Rendering;
 
 namespace TodoApp;
 
@@ -13,45 +12,70 @@ public class TodoManager
     {
         switch (input)
         {
-            case "Add New Todo":
+            case "Add New":
                 Add();
                 break;
 
-            case "View All Todos":
+            case "View All":
                 View();
                 break;
 
-            case "Edit Todo":
+            case "Edit":
                 Edit();
                 break;
 
-            case "Mark Completed":
-                MarkCompleted();
-                break;
-
-            case "Delete Todo":
+            case "Delete":
                 Delete();
                 break;
 
             case "Exit":
                 Environment.Exit(0);
                 break;
+
+            default:
+                Console.WriteLine($"Command '{input}' not recognized");
+                break;
         }
+    }
+
+    public static string GetUserInput(string helpText = "")
+    {
+        Console.Write($"{helpText}>>> ");
+        var userInput = Console.ReadLine().Trim().ToLower();
+        return userInput;
     }
 
     private void Add()
     {
-        var todo = new Todo();
-        var desc = AnsiConsole.Prompt(new TextPrompt<string>("Enter Todo Description:"));
-        var dueDate = AnsiConsole.Prompt(
-            new TextPrompt<DateOnly?>("Enter Due Date (MM/DD/YYYY or leave blank):")
-                .DefaultValue(null)
-                .ShowDefaultValue(false)
-        );
+        var rule = new Rule("[red]Adding new todo[/]")
+        {
+            Justification = Justify.Left
+        };
 
-        todo.Description = desc;
-        todo.DueDate = dueDate.ToString();
+        AnsiConsole.Write(rule);
+
+        var todo = new Todo();
+
+        int setDesc;
+        do
+        {
+            var desc = GetUserInput("Enter Description ");
+            setDesc = todo.SetDescription(desc);
+        } while (setDesc != 1);
+
+        int setDate;
+        do
+        {
+            var date = GetUserInput("Enter Due Date (MM/DD/YYYY or leave blank) ");
+            setDate = todo.SetDate(date);
+        } while (setDate != 1);
+
         _todos.Add(todo);
+
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.Write("Success! ");
+        Console.ResetColor();
+        Console.WriteLine("Your todo has bee added.");
     }
 
     private void View()
@@ -85,22 +109,11 @@ public class TodoManager
     {
         if (_todos.Count > 0)
         {
-            var selection = AnsiConsole.Prompt(
-                new SelectionPrompt<string>()
-                    .AddChoices(_todos.Select((todo) => todo.Description))
-                    .Mode(SelectionMode.Independent)
-            );
-
-            Console.WriteLine($"You chose {selection}");
         }
         else
         {
             Console.WriteLine("\nYou have no todos to edit.\n");
         }
-    }
-
-    private void MarkCompleted()
-    {
     }
 
     private void Delete()

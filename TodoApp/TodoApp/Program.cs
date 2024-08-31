@@ -1,4 +1,5 @@
 ﻿using Spectre.Console;
+
 using TodoApp;
 
 
@@ -7,13 +8,13 @@ internal class Program
     public static void Main()
     {
         DisplayInitMessage();
-
         var userInput = "";
         var todoManager = new TodoManager();
 
         while (userInput != "Exit")
         {
-            userInput = GetUserInput();
+            userInput = SelectAction();
+            Console.Clear();
             todoManager.InterpretUserInput(userInput);
         }
     }
@@ -23,24 +24,21 @@ internal class Program
         Console.WriteLine(
             "  ______          __         __    _      __ \n /_  __/___  ____/ /___     / /   (_)____/ /_\n  / / / __ \\/ __  / __ \\   / /   / / ___/ __/\n / / / /_/ / /_/ / /_/ /  / /___/ (__  ) /_  \n/_/  \\____/\\__,_/\\____/  /_____/_/____/\\__/"
         );
-        Console.WriteLine("\nWelcome to your todo list. What would you like to do?");
     }
 
-    private static string GetUserInput()
+    private static string SelectAction()
     {
         var userInput = AnsiConsole.Prompt(
             new SelectionPrompt<string>()
                 .AddChoices([
-                    "Add New Todo",
-                    "View All Todos",
-                    "Edit Todo",
-                    "Mark Completed",
-                    "Delete Todo",
+                    "Add New",
+                    "View All",
+                    "Edit",
+                    "Delete",
                     "Exit"
                 ])
                 .EnableSearch()
-                
-            );
+        );
         return userInput;
     }
 }
