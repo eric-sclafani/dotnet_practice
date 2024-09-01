@@ -1,4 +1,5 @@
 using Spectre.Console;
+using TodoApp.DB;
 
 namespace TodoApp;
 
@@ -6,8 +7,10 @@ using Models;
 
 public class TodoManager
 {
-    private readonly List<Todo> _todos = [];
-    private int counter;
+    public TodoManager()
+    {
+        DBManager.InitTable();
+    }
 
     public void InterpretUserInput(string input)
     {
@@ -38,14 +41,12 @@ public class TodoManager
         return userInput;
     }
 
-    private void Add()
+    private static void Add()
     {
         // TODO: make this a loop until the user wants to stop adding todos
-        
+
         ShowRule("[red]Adding new todo[/]");
         var todo = new Todo();
-        counter++;
-        todo.ID = counter;
 
         int setDesc;
         do
@@ -61,14 +62,14 @@ public class TodoManager
             setDate = todo.SetDate(date);
         } while (setDate != 1);
 
-        _todos.Add(todo);
-
-        AnsiConsole.Markup("[green]Success![/] ");
-        Console.ResetColor();
-        Console.WriteLine("Your todo has bee added.");
+        var result = DBManager.Insert(todo);
+        AnsiConsole.MarkupLine(result == 1
+            ? "[green]Success![/] Your todo has been added."
+            : "[red]Oops! Something went wrong[/]");
+        View();
     }
 
-    private void View()
+    private static void View()
     {
         var grid = new Grid();
         grid.AddColumns(4);
@@ -79,11 +80,12 @@ public class TodoManager
             new Text("Due date", new Style(Color.Blue, Color.Black)).RightJustified()
         ]);
 
-        foreach (var todo in _todos)
+        var todos = DBManager.View();
+        foreach (var todo in todos)
         {
             grid.AddRow(
                 new Text(todo.ID.ToString()),
-                new Text(todo.IsCompleted ? "[X]" : "[ ]"),
+                new Text(todo.IsCompleted == 1 ? "[X]" : "[ ]"),
                 new Text(todo.Description),
                 new Text(todo.DueDate)
             );
@@ -99,32 +101,30 @@ public class TodoManager
 
     private void Edit()
     {
-        if (_todos.Count > 0)
-        {
-            ShowRule("[red]Editing todo[/]");
-            View();
-            AnsiConsole.MarkupLine("Select todo ID");
-            
-            var userSelection = GetUserTodoSelection();
-            Console.WriteLine($"You chose todo {userSelection.ID}");
-
-
-
-        }
-        else
-        {
-            AnsiConsole.MarkupLine("\nYou have [fuchsia]no todos to edit.[/]\n");
-        }
+        // if (_todos.Count > 0)
+        // {
+        //     ShowRule("[red]Editing todo[/]");
+        //     View();
+        //     AnsiConsole.MarkupLine("Select todo ID");
+        //
+        //     var userSelection = GetUserTodoSelection();
+        //     Console.WriteLine($"You chose todo {userSelection.ID} to edit!!!");
+        // }
+        // else
+        // {
+        //     AnsiConsole.MarkupLine("\nYou have [fuchsia]no todos to edit.[/]\n");
+        // }
     }
 
     private void Delete()
     {
+        // TODO: add auto incrementing to DB table so IDS can update automatically
     }
 
     private void Clear()
     {
-        _todos.Clear();
-        AnsiConsole.MarkupLine("Your todos have been [blue]cleared[/]");
+        // _todos.Clear();
+        // AnsiConsole.MarkupLine("Your todos have been [blue]cleared[/]");
     }
 
     private static void ShowRule(string text)
@@ -137,33 +137,32 @@ public class TodoManager
         AnsiConsole.Write(rule);
     }
 
-    private Todo? GetTodoById(int ID)
-    {
-        return _todos.FirstOrDefault(todo => todo.ID == ID, null);
-    }
-
-    private Todo GetUserTodoSelection()
-    {
-        do
-        {
-            var userInput = GetUserInput();
-            if (int.TryParse(userInput, out var number))
-            {
-                var todo = GetTodoById(number);
-                if (todo is null)
-                {
-                    AnsiConsole.MarkupLine($"[red]Could not find todo number '{number}'[/]");
-                }
-                else
-                {
-                    return todo;
-                }
-            }
-            else
-            {
-                AnsiConsole.MarkupLine($"[red]Invalid input: '{userInput}'. Must be a number.[/]");
-            }
-                
-        } while (true);
-    }
+    // private Todo? GetTodoById(int ID)
+    // {
+    //     return _todos.FirstOrDefault(todo => todo.ID == ID, null);
+    // }
+    //
+    // private Todo GetUserTodoSelection()
+    // {
+    //     do
+    //     {
+    //         var userInput = GetUserInput();
+    //         if (int.TryParse(userInput, out var number))
+    //         {
+    //             var todo = GetTodoById(number);
+    //             if (todo is null)
+    //             {
+    //                 AnsiConsole.MarkupLine($"[red]Could not find todo number '{number}'[/]");
+    //             }
+    //             else
+    //             {
+    //                 return todo;
+    //             }
+    //         }
+    //         else
+    //         {
+    //             AnsiConsole.MarkupLine($"[red]Invalid input: '{userInput}'. Must be a number.[/]");
+    //         }
+    //     } while (true);
+    // }
 }

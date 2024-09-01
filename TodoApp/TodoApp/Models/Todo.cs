@@ -1,11 +1,12 @@
 using Spectre.Console;
+
 namespace TodoApp.Models;
 
 public record Todo
 {
     public int ID { get; set; }
     public string Description;
-    public bool IsCompleted { get; set; } = false;
+    public int IsCompleted { get; set; } = 0;
     public string? DueDate { get; set; } = "";
 
     public int SetDescription(string text)
