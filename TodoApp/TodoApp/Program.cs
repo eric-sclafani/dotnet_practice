@@ -21,13 +21,16 @@ internal class Program
 
     private static void DisplayInitMessage()
     {
-        Console.WriteLine(
-            "  ______          __         __    _      __ \n /_  __/___  ____/ /___     / /   (_)____/ /_\n  / / / __ \\/ __  / __ \\   / /   / / ___/ __/\n / / / /_/ / /_/ / /_/ /  / /___/ (__  ) /_  \n/_/  \\____/\\__,_/\\____/  /_____/_/____/\\__/"
-        );
+        AnsiConsole.Write(
+            new FigletText("Todo")
+                .LeftJustified()
+                .Color(Color.Blue)
+            );
     }
 
     private static string SelectAction()
     {
+        Console.WriteLine("What would you like to do?");
         var userInput = AnsiConsole.Prompt(
             new SelectionPrompt<string>()
                 .AddChoices([
@@ -35,6 +38,7 @@ internal class Program
                     "View All",
                     "Edit",
                     "Delete",
+                    "Clear",
                     "Exit"
                 ])
                 .EnableSearch()

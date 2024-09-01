@@ -7,38 +7,31 @@ using Models;
 public class TodoManager
 {
     private readonly List<Todo> _todos = [];
+    private int counter;
 
     public void InterpretUserInput(string input)
     {
-        switch (input)
+        var actions = new Dictionary<string, Action>
         {
-            case "Add New":
-                Add();
-                break;
+            { "Add New", Add },
+            { "View All", View },
+            { "Edit", Edit },
+            { "Delete", Delete },
+            { "Clear", Clear },
+            { "Exit", () => Environment.Exit(0) }
+        };
 
-            case "View All":
-                View();
-                break;
-
-            case "Edit":
-                Edit();
-                break;
-
-            case "Delete":
-                Delete();
-                break;
-
-            case "Exit":
-                Environment.Exit(0);
-                break;
-
-            default:
-                Console.WriteLine($"Command '{input}' not recognized");
-                break;
+        if (actions.TryGetValue(input, out var value))
+        {
+            value();
+        }
+        else
+        {
+            Console.WriteLine($"Command '{input}' not recognized");
         }
     }
 
-    public static string GetUserInput(string helpText = "")
+    private static string GetUserInput(string helpText = "")
     {
         Console.Write($"{helpText}>>> ");
         var userInput = Console.ReadLine().Trim().ToLower();
@@ -47,14 +40,12 @@ public class TodoManager
 
     private void Add()
     {
-        var rule = new Rule("[red]Adding new todo[/]")
-        {
-            Justification = Justify.Left
-        };
-
-        AnsiConsole.Write(rule);
-
+        // TODO: make this a loop until the user wants to stop adding todos
+        
+        ShowRule("[red]Adding new todo[/]");
         var todo = new Todo();
+        counter++;
+        todo.ID = counter;
 
         int setDesc;
         do
@@ -72,8 +63,7 @@ public class TodoManager
 
         _todos.Add(todo);
 
-        Console.ForegroundColor = ConsoleColor.Green;
-        Console.Write("Success! ");
+        AnsiConsole.Markup("[green]Success![/] ");
         Console.ResetColor();
         Console.WriteLine("Your todo has bee added.");
     }
@@ -81,8 +71,9 @@ public class TodoManager
     private void View()
     {
         var grid = new Grid();
-        grid.AddColumns(3);
+        grid.AddColumns(4);
         grid.AddRow([
+            new Text("Todo ID", new Style(Color.Fuchsia, Color.Black)).Centered(),
             new Text("Completed", new Style(Color.Red, Color.Black)).LeftJustified(),
             new Text("Description", new Style(Color.Green, Color.Black)).Centered(),
             new Text("Due date", new Style(Color.Blue, Color.Black)).RightJustified()
@@ -91,6 +82,7 @@ public class TodoManager
         foreach (var todo in _todos)
         {
             grid.AddRow(
+                new Text(todo.ID.ToString()),
                 new Text(todo.IsCompleted ? "[X]" : "[ ]"),
                 new Text(todo.Description),
                 new Text(todo.DueDate)
@@ -109,14 +101,69 @@ public class TodoManager
     {
         if (_todos.Count > 0)
         {
+            ShowRule("[red]Editing todo[/]");
+            View();
+            AnsiConsole.MarkupLine("Select todo ID");
+            
+            var userSelection = GetUserTodoSelection();
+            Console.WriteLine($"You chose todo {userSelection.ID}");
+
+
+
         }
         else
         {
-            Console.WriteLine("\nYou have no todos to edit.\n");
+            AnsiConsole.MarkupLine("\nYou have [fuchsia]no todos to edit.[/]\n");
         }
     }
 
     private void Delete()
     {
+    }
+
+    private void Clear()
+    {
+        _todos.Clear();
+        AnsiConsole.MarkupLine("Your todos have been [blue]cleared[/]");
+    }
+
+    private static void ShowRule(string text)
+    {
+        var rule = new Rule(text)
+        {
+            Justification = Justify.Left
+        };
+
+        AnsiConsole.Write(rule);
+    }
+
+    private Todo? GetTodoById(int ID)
+    {
+        return _todos.FirstOrDefault(todo => todo.ID == ID, null);
+    }
+
+    private Todo GetUserTodoSelection()
+    {
+        do
+        {
+            var userInput = GetUserInput();
+            if (int.TryParse(userInput, out var number))
+            {
+                var todo = GetTodoById(number);
+                if (todo is null)
+                {
+                    AnsiConsole.MarkupLine($"[red]Could not find todo number '{number}'[/]");
+                }
+                else
+                {
+                    return todo;
+                }
+            }
+            else
+            {
+                AnsiConsole.MarkupLine($"[red]Invalid input: '{userInput}'. Must be a number.[/]");
+            }
+                
+        } while (true);
     }
 }

@@ -1,7 +1,9 @@
+using Spectre.Console;
 namespace TodoApp.Models;
 
 public record Todo
 {
+    public int ID { get; set; }
     public string Description;
     public bool IsCompleted { get; set; } = false;
     public string? DueDate { get; set; } = "";
@@ -10,7 +12,7 @@ public record Todo
     {
         if (text.Trim() == "")
         {
-            Console.WriteLine("Incorrect description format");
+            AnsiConsole.MarkupLine("[red]Incorrect description format.[/]");
             return 0;
         }
 
@@ -22,11 +24,11 @@ public record Todo
     {
         if (text == "") return 1;
 
-        var isParsed = DateTime.TryParse(text, out var date);
+        var isParsed = DateOnly.TryParse(text, out var date);
 
         if (!isParsed)
         {
-            Console.WriteLine("Incorrect date format");
+            AnsiConsole.MarkupLine("[red]Incorrect date format[/]");
             return 0;
         }
 
