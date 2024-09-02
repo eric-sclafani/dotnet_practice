@@ -6,7 +6,7 @@ public record Todo
 {
     public int ID { get; set; }
     public string Description;
-    public int IsCompleted { get; init; }
+    public int IsCompleted { get; set; }
     public string? DueDate { get; set; } = "";
 
     public void SetDescription()

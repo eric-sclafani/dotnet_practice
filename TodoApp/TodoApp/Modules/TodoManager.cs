@@ -83,8 +83,14 @@ public static class TodoManager
             View();
             AnsiConsole.MarkupLine("[green]Select ID[/]");
             var userSelection = GetUserTodoSelection();
+            
+            var result = DBManager.Update(userSelection.ID);
+            AnsiConsole.MarkupLine(result == 1
+                ? "[green]Success![/] Todo item edited."
+                : "[red]Oops! Something went wrong[/]");
 
-            Console.WriteLine($"You chose to edit {userSelection}");
+            View();
+
         }
         else
         {

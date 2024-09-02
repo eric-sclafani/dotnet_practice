@@ -68,13 +68,21 @@ public class DBManager
         return todos;
     }
 
-    // public static int Update(Todo todo)
-    // {
-    //     
-    // }
-    //
+    public static int Update(int todoID)
+    {
+        // var todo = new Todo();
+        // using var connection = new SqliteConnection(ConnectionString);
+        // var queryCmd = connection.CreateCommand();
+        // queryCmd.CommandText = "SELECT * FROM Todo WHERE ID = @ID;";
+        // queryCmd.Parameters.AddWithValue("@ID", todoID);
+        
+        
+        
+        
+    }
     
-    public static int Delete(int? todoID)
+    
+    public static int Delete(int todoID)
     {
         using var connection = new SqliteConnection(ConnectionString);
         connection.Open();
