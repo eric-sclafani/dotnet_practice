@@ -6,34 +6,44 @@ public record Todo
 {
     public int ID { get; set; }
     public string Description;
-    public int IsCompleted { get; set; } = 0;
+    public int IsCompleted { get; init; }
     public string? DueDate { get; set; } = "";
 
-    public int SetDescription(string text)
+    public void SetDescription()
     {
-        if (text.Trim() == "")
+        var isValid = false;
+        do
         {
-            AnsiConsole.MarkupLine("[red]Incorrect description format.[/]");
-            return 0;
-        }
-
-        Description = text;
-        return 1;
+            var text = Utils.GetUserInput("[green]Enter Description[/]");
+            if (text != "")
+            {
+                isValid = true;
+                Description = text;
+            }
+            else
+            {
+                AnsiConsole.MarkupLine("[red]Incorrect description format.[/]");
+            }
+        } while (!isValid);
     }
 
-    public int SetDate(string text)
+    public void SetDate()
     {
-        if (text == "") return 1;
-
-        var isParsed = DateOnly.TryParse(text, out var date);
-
-        if (!isParsed)
+        var isValid = false;
+        do
         {
-            AnsiConsole.MarkupLine("[red]Incorrect date format[/]");
-            return 0;
-        }
+            var text = Utils.GetUserInput("[green]Enter Due Date[/] (MM/DD/YYYY or leave blank)");
+            var isParsed = DateOnly.TryParse(text, out var dueDate);
 
-        DueDate = date.ToString();
-        return 1;
+            if (isParsed || text == "")
+            {
+                isValid = true;
+                DueDate = text == "" ? "" : dueDate.ToString();
+            }
+            else
+            {
+                AnsiConsole.MarkupLine("[red]Incorrect date format[/]");
+            }
+        } while (!isValid);
     }
 }

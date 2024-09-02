@@ -1,5 +1,5 @@
 ﻿using Spectre.Console;
-
+using TodoApp.DB;
 using TodoApp;
 
 
@@ -9,13 +9,13 @@ internal class Program
     {
         DisplayInitMessage();
         var userInput = "";
-        var todoManager = new TodoManager();
+        DBManager.MaybeInitTable();
 
         while (userInput != "Exit")
         {
             userInput = SelectAction();
             Console.Clear();
-            todoManager.InterpretUserInput(userInput);
+            TodoManager.InterpretUserInput(userInput);
         }
     }
 
@@ -25,7 +25,7 @@ internal class Program
             new FigletText("Todo")
                 .LeftJustified()
                 .Color(Color.Blue)
-            );
+        );
     }
 
     private static string SelectAction()
@@ -38,7 +38,7 @@ internal class Program
                     "View All",
                     "Edit",
                     "Delete",
-                    "Clear",
+                    "Clear All",
                     "Exit"
                 ])
                 .EnableSearch()

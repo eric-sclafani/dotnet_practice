@@ -26,7 +26,7 @@ public class DBManager
         return result;
     }
 
-    public static void InitTable()
+    public static void MaybeInitTable()
     {
         using var connection = new SqliteConnection(ConnectionString);
         connection.Open();
@@ -43,15 +43,16 @@ public class DBManager
         createTableCmd.ExecuteNonQuery();
     }
 
-    public static List<Todo> View()
+    public static List<Todo> QueryTodos()
     {
         var todos = new List<Todo>();
 
         using var connection = new SqliteConnection(ConnectionString);
         connection.Open();
-        var queryCmd = connection.CreateCommand();
 
+        var queryCmd = connection.CreateCommand();
         queryCmd.CommandText = "SELECT * FROM Todo;";
+
         using var reader = queryCmd.ExecuteReader();
         while (reader.Read())
         {
@@ -72,13 +73,31 @@ public class DBManager
     //     
     // }
     //
-    // public static int Delete(Todo todo)
-    // {
-    //     
-    // }
-    //
-    // public static int Clear(Todo[] todos)
-    // {
-    //     
-    // }
+    
+    public static int Delete(int? todoID)
+    {
+        using var connection = new SqliteConnection(ConnectionString);
+        connection.Open();
+
+        var queryCmd = connection.CreateCommand();
+        queryCmd.CommandText = """
+            DELETE FROM Todo
+            WHERE ID = @ID;
+        """;
+
+        queryCmd.Parameters.AddWithValue("@ID", todoID);
+
+        var result = queryCmd.ExecuteNonQuery();
+        return result;
+    }
+
+    public static void Clear()
+    {
+        using var connection = new SqliteConnection(ConnectionString);
+        connection.Open();
+
+        var queryCmd = connection.CreateCommand();
+        queryCmd.CommandText = "DROP TABLE Todo ;";
+        queryCmd.ExecuteNonQuery();
+    }
 }
