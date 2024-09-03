@@ -31,18 +31,15 @@ internal class Program
     private static string SelectAction()
     {
         Console.WriteLine("What would you like to do?");
-        var userInput = AnsiConsole.Prompt(
-            new SelectionPrompt<string>()
-                .AddChoices([
-                    "Add New",
-                    "View All",
-                    "Edit",
-                    "Delete",
-                    "Clear All",
-                    "Exit"
-                ])
-                .EnableSearch()
-        );
+        var userInput = Utils.SelectionFromChoices([
+            "Add New",
+            "View All",
+            "Edit",
+            "Delete",
+            "Clear All",
+            "Exit"
+        ]);
+                
         return userInput;
     }
 }

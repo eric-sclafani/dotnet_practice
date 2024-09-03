@@ -1,4 +1,5 @@
 using Microsoft.Data.Sqlite;
+using Microsoft.VisualBasic;
 using TodoApp.Models;
 
 namespace TodoApp.DB;
@@ -68,20 +69,52 @@ public class DBManager
         return todos;
     }
 
-    public static int Update(int todoID)
+    public static void Update(
+        int todoID,
+        string? desc = null,
+        int? completed = null,
+        string? dueDate = null
+    )
     {
-        // var todo = new Todo();
-        // using var connection = new SqliteConnection(ConnectionString);
-        // var queryCmd = connection.CreateCommand();
-        // queryCmd.CommandText = "SELECT * FROM Todo WHERE ID = @ID;";
-        // queryCmd.Parameters.AddWithValue("@ID", todoID);
-        
-        
-        
-        
+        using var connection = new SqliteConnection(ConnectionString);
+        connection.Open();
+        var queryCmd = connection.CreateCommand();
+
+        var cmdText = "";
+        if (desc is not null)
+        {
+            cmdText = """
+            UPDATE Todo
+            SET Description = @desc
+            WHERE ID = @ID;
+            """;
+            queryCmd.Parameters.AddWithValue("@desc", desc);
+        }
+        else if (completed is not null)
+        {
+            cmdText = """
+            UPDATE Todo
+            SET IsCompleted = @completed
+            WHERE ID = @ID;
+            """;
+            queryCmd.Parameters.AddWithValue("@completed", completed);
+        }
+        else if (dueDate is not null)
+        {
+            cmdText = """
+            UPDATE Todo
+            SET DueDate = @dueDate
+            WHERE ID = @ID;
+            """;
+            queryCmd.Parameters.AddWithValue("@dueDate", dueDate);
+        }
+
+        queryCmd.CommandText = cmdText;
+        queryCmd.Parameters.AddWithValue("@ID", todoID);
+        queryCmd.ExecuteNonQuery();
     }
-    
-    
+
+
     public static int Delete(int todoID)
     {
         using var connection = new SqliteConnection(ConnectionString);

@@ -15,7 +15,7 @@ public static class TodoManager
             { "View All", View },
             { "Edit", Edit },
             { "Delete", Delete },
-            {"Clear All", Clear },
+            { "Clear All", Clear },
             { "Exit", () => Environment.Exit(0) }
         };
 
@@ -81,16 +81,60 @@ public static class TodoManager
         {
             ShowRule("[red]Editing todo[/]");
             View();
+
             AnsiConsole.MarkupLine("[green]Select ID[/]");
-            var userSelection = GetUserTodoSelection();
-            
-            var result = DBManager.Update(userSelection.ID);
-            AnsiConsole.MarkupLine(result == 1
-                ? "[green]Success![/] Todo item edited."
-                : "[red]Oops! Something went wrong[/]");
+            var todo = GetUserTodoSelection();
+            AnsiConsole.MarkupLine($"You chose to edit todo [fuchsia]{todo.ID}[/]");
 
-            View();
+            string toEdit;
+            do
+            {
+                Console.WriteLine("What do you want to edit? Select 'Done' to stop editing");
+                toEdit = Utils.SelectionFromChoices([
+                    "Completed",
+                    "Description",
+                    "Due Date",
+                    "Done"
+                ]);
 
+                switch (toEdit)
+                {
+                    case "Completed":
+                        var prompt = Utils.YesNoPrompt("Is this todo item completed?");
+                        var completed = prompt ? 1 : 0;
+                        DBManager.Update(todo.ID, completed: completed);
+                        break;
+
+                    case "Description":
+                        var desc = Utils.GetUserInput("Enter new description");
+                        DBManager.Update(todo.ID, desc: desc);
+                        break;
+
+                    case "Due Date":
+                        var isValid = false;
+                        var newDate = "";
+                        do
+                        {
+                            var text = Utils.GetUserInput("[green]Enter new Due Date[/] (MM/DD/YYYY or leave blank)");
+                            var isParsed = DateOnly.TryParse(text, out var dueDate);
+
+                            if (isParsed || text == "")
+                            {
+                                isValid = true;
+                                newDate = text == "" ? "" : dueDate.ToString();
+                            }
+                            else
+                            {
+                                AnsiConsole.MarkupLine("[red]Incorrect date format[/]");
+                            }
+                        } while (!isValid);
+
+                        DBManager.Update(todo.ID, dueDate: newDate);
+                        break;
+                }
+
+                View();
+            } while (toEdit != "Done");
         }
         else
         {
@@ -106,9 +150,9 @@ public static class TodoManager
             View();
             ShowRule("[red]Deleting todo[/]");
             AnsiConsole.MarkupLine("[green]Select ID[/]");
-            var userSelection = GetUserTodoSelection();
+            var todo = GetUserTodoSelection();
 
-            var result = DBManager.Delete(userSelection.ID);
+            var result = DBManager.Delete(todo.ID);
             AnsiConsole.MarkupLine(result == 1
                 ? "[green]Success![/] Todo item deleted."
                 : "[red]Oops! Something went wrong[/]");
@@ -120,20 +164,15 @@ public static class TodoManager
             AnsiConsole.MarkupLine("\nYou have [fuchsia]no todos to delete.[/]\n");
         }
     }
-    
+
     private static void Clear()
     {
+        var prompt = Utils.YesNoPrompt("[red]WARNING[/]: you are about to delete [red]ALL[/] todos. Proceed?");
+        if (!prompt) return;
 
-       var prompt = AnsiConsole.Prompt(
-           new ConfirmationPrompt("[red]WARNING[/]: you are about to delete [red]ALL[/] todos. Proceed?")  
-               .ShowChoices()
-               .ShowDefaultValue()
-       );
-       if (!prompt) return;
-       
-       DBManager.Clear();
-       DBManager.MaybeInitTable();
-       View();
+        DBManager.Clear();
+        DBManager.MaybeInitTable();
+        View();
     }
 
     private static void ShowRule(string text)
