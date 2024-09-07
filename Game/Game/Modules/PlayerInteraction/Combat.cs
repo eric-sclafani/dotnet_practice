@@ -1,4 +1,5 @@
 using Game.Models;
+using Spectre.Console;
 
 namespace Game.Modules.PlayerInteraction;
 
@@ -7,10 +8,11 @@ public class Combat : IPlayerInteraction
     private readonly Player _player;
     private readonly Enemy _enemy;
     public bool Resolved { get; set; }
-    
+
     public void Begin()
     {
-        Console.WriteLine($"You have entered a battle with a {_enemy.Name}! Prepare for battle!");
+        var enemyName = $"[red]{_enemy.Name}[/]";
+        AnsiConsole.Markup($"You have entered a battle with a {enemyName}! Prepare for battle!");
         while (_enemy.IsAlive() && _player.IsAlive())
         {
             var userInput = Player.playerInput();
@@ -18,12 +20,12 @@ public class Combat : IPlayerInteraction
             {
                 var playerDmg = _player.DealDamage();
                 _enemy.ReceiveDamage(playerDmg);
-                Console.WriteLine($"\nYou deal {playerDmg} damage to the {_enemy.Name}.");
+                Console.WriteLine($"\nYou deal [blue]{playerDmg}[/] damage to the {enemyName}.");
             }
 
             var enemyDmg = _enemy.DealDamage();
             _player.ReceiveDamage(enemyDmg);
-            Console.WriteLine($"The {_enemy.Name} deals {enemyDmg} to you.");
+            Console.WriteLine($"The {enemyName} deals {enemyDmg} to you.");
             DisplayStats();
         }
 

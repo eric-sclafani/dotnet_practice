@@ -7,27 +7,27 @@ public class World
     private readonly int _rows;
     private readonly int _cols;
     private readonly Point[,] _grid;
+    private int _pointInteractionThreshold;
     private Point _playerPosition { get; set; }
 
-    public World(int rows, int cols)
+    public World(int rows, int cols, int thres = 6)
     {
         _rows = rows;
         _cols = cols;
+        _pointInteractionThreshold = thres;
+
         _grid = InitGrid();
         _playerPosition = SetPlayerStartPosition();
     }
 
     public bool ChangePlayerPosition(string? playerInput)
     {
-        var lastPosition = _playerPosition;
         var newPos = GetNewCoord(playerInput);
-
         try
         {
             var newX = _playerPosition.X + newPos.x;
             var newY = _playerPosition.Y + newPos.y;
             _playerPosition = _grid[newX, newY];
-            Console.WriteLine($"You moved from {lastPosition} to to {_playerPosition}");
             return true;
         }
         catch
@@ -36,18 +36,29 @@ public class World
             return false;
         }
     }
-    
+
     public void DisplayGrid()
     {
+        Console.Clear();
         for (var row = 0; row < _rows; row++)
         {
             for (var col = 0; col < _cols; col++)
             {
                 var point = _grid[row, col];
 
-                if (point == _playerPosition)
+                if (point.Combat is not null && point == _playerPosition)
                 {
                     Console.BackgroundColor = ConsoleColor.DarkCyan;
+                    Console.ForegroundColor = ConsoleColor.Red;
+                }
+
+                else if (point == _playerPosition)
+                {
+                    Console.BackgroundColor = ConsoleColor.DarkCyan;
+                }
+                else if (point.Combat is not null)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
                 }
 
                 Console.Write(point);
@@ -65,6 +76,12 @@ public class World
         for (var col = 0; col < _cols; col++)
         {
             Point point = new(row, col);
+
+            if (PointGetsCombat())
+            {
+                point.Combat = new Combat();
+            }
+
             grid[row, col] = point;
         }
 
@@ -95,10 +112,10 @@ public class World
         return newPos;
     }
 
-    private static bool PointGetsInteraction()
+    private bool PointGetsCombat()
     {
         var r = new Random();
-
+        var chance = r.Next(1, 11);
+        return chance >= _pointInteractionThreshold;
     }
-    
 }

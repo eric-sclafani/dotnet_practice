@@ -8,7 +8,6 @@ public class Point
     public int Y { get; }
     public Combat? Combat{ get; set; }
     
-
     public Point(int x, int y)
     {
         X = x;
