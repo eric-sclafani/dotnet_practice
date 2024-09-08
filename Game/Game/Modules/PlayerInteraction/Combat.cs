@@ -13,23 +13,25 @@ public class Combat : IPlayerInteraction
     {
         if (Enemy is not null && Player is not null)
         {
-            const string playerName = $"[green]You[/]";
+            var playerName = $"[green]{Player.Name}[/]";
             var enemyName = $"[red]{Enemy.Name}[/]";
             AnsiConsole.MarkupLine($"{playerName} have entered a battle with a {enemyName}! Prepare for battle!");
 
             while (Enemy.IsAlive() && Player.IsAlive())
             {
                 var userInput = Player.playerInput();
+                Console.Clear();
                 if (userInput == "a")
                 {
                     var playerDmg = Player.DealDamage();
                     Enemy.ReceiveDamage(playerDmg);
-                    AnsiConsole.MarkupLine($"{playerName} deal [blue]{playerDmg}[/] damage to the {enemyName}.");
+                    AnsiConsole.MarkupLine($"{playerName} deals [blue]{playerDmg}[/] damage to the {enemyName}.");
                 }
 
                 var enemyDmg = Enemy.DealDamage();
                 Player.ReceiveDamage(enemyDmg);
                 AnsiConsole.MarkupLine($"The {enemyName} deals [blue]{enemyDmg}[/] to {playerName}.");
+
                 DisplayStats();
             }
 

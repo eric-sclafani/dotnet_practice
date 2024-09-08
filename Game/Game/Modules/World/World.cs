@@ -24,7 +24,7 @@ public class World
         _playerPosition = SetPlayerStartPosition();
     }
 
-    public bool ChangePlayerPosition(string? playerInput)
+    public void ChangePlayerPosition(string? playerInput)
     {
         var newPos = GetNewCoord(playerInput);
         try
@@ -36,7 +36,6 @@ public class World
 
             var combat = _playerPosition.Combat;
 
-
             if (combat is not null && !combat.Resolved)
             {
                 var enemy = new Enemy("Test Goblin", 10, 2, 5);
@@ -44,13 +43,10 @@ public class World
                 combat.Enemy = enemy;
                 combat.Begin();
             }
-
-            return true;
         }
         catch
         {
             Console.WriteLine("You have reached the end of the map and cannot go that way.");
-            return false;
         }
     }
 
@@ -63,7 +59,7 @@ public class World
             {
                 var point = _grid[row, col];
 
-                if (point.Combat is not null && point.IsEqualTo(_playerPosition))
+                if (point.Combat is not null && !point.Combat.Resolved && point.IsEqualTo(_playerPosition))
                 {
                     Console.BackgroundColor = ConsoleColor.DarkCyan;
                     Console.ForegroundColor = ConsoleColor.Red;
@@ -73,7 +69,7 @@ public class World
                 {
                     Console.BackgroundColor = ConsoleColor.DarkCyan;
                 }
-                else if (point.Combat is not null)
+                else if (point.Combat is not null && !point.Combat.Resolved)
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
                 }
@@ -93,11 +89,11 @@ public class World
         for (var col = 0; col < _cols; col++)
         {
             Point point = new(row, col);
-            //
-            // if (PointGetsCombat() && !point.IsEqualTo(SetPlayerStartPosition()))
-            // {
-            //     point.Combat = new Combat();
-            // }
+
+            if (PointGetsCombat() && !point.IsEqualTo(SetPlayerStartPosition()))
+            {
+                point.Combat = new Combat();
+            }
 
             grid[row, col] = point;
         }
@@ -112,23 +108,8 @@ public class World
         return new Point(x, y);
     }
 
-
-    // TODO: look into letting users navigate using arrow keys
     private static (int x, int y) GetNewCoord(string input)
     {
-        // (int x, int y) newPos = input switch
-        // {
-        //     "n" => (-1, 0),
-        //     "s" => (1, 0),
-        //     "e" => (0, 1),
-        //     "w" => (0, -1),
-        //     "ne" => (-1, 1),
-        //     "nw" => (-1, -1),
-        //     "se" => (1, -1),
-        //     "sw" => (1, 1),
-        //     _ => (0, 0)
-        // };
-        // return newPos;
         (int x, int y) newPos = input switch
         {
             "UpArrow" => (-1, 0),
@@ -144,6 +125,6 @@ public class World
     {
         var r = new Random();
         var chance = r.Next(1, 11);
-        return chance >= _pointInteractionThreshold;
+        return chance <= _pointInteractionThreshold;
     }
 }

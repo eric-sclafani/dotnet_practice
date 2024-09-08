@@ -6,38 +6,29 @@ namespace Game;
 
 internal class Program
 {
-    
     private static void Main(string[] args)
     {
         // move to title screen eventually
         const int rows = 4;
         const int cols = 5;
-        const int thres = 6;
+        const int thres = 4;
 
-        
+
         Player player = new("Eric", 30, 1, 8);
         World world = new(rows, cols, thres, player);
-        
+
         var playerInput = "";
-        while (playerInput != "exit")
+        while (playerInput != "exit" && player.IsAlive())
         {
             world.DisplayGrid();
             Console.WriteLine("Where would you like to go?");
             playerInput = Input.GetDirection();
-        
-            var playerMoved = world.ChangePlayerPosition(playerInput);
-            if (playerMoved)
-            {
-                world.DisplayGrid();
-            }
+
+            world.ChangePlayerPosition(playerInput);
+
+            
         }
     }
-
-    public static void GameLoop()
-    {
-        
-    }
-    
     
 }
 
