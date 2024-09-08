@@ -5,41 +5,50 @@ namespace Game.Modules.PlayerInteraction;
 
 public class Combat : IPlayerInteraction
 {
-    private readonly Player _player;
-    private readonly Enemy _enemy;
+    public Player Player { get; set; }
+    public Enemy Enemy { get; set; }
     public bool Resolved { get; set; }
 
     public void Begin()
     {
-        var enemyName = $"[red]{_enemy.Name}[/]";
-        AnsiConsole.Markup($"You have entered a battle with a {enemyName}! Prepare for battle!");
-        while (_enemy.IsAlive() && _player.IsAlive())
+        if (Enemy is not null && Player is not null)
         {
-            var userInput = Player.playerInput();
-            if (userInput == "a")
+            const string playerName = $"[green]You[/]";
+            var enemyName = $"[red]{Enemy.Name}[/]";
+            AnsiConsole.MarkupLine($"{playerName} have entered a battle with a {enemyName}! Prepare for battle!");
+
+            while (Enemy.IsAlive() && Player.IsAlive())
             {
-                var playerDmg = _player.DealDamage();
-                _enemy.ReceiveDamage(playerDmg);
-                Console.WriteLine($"\nYou deal [blue]{playerDmg}[/] damage to the {enemyName}.");
+                var userInput = Player.playerInput();
+                if (userInput == "a")
+                {
+                    var playerDmg = Player.DealDamage();
+                    Enemy.ReceiveDamage(playerDmg);
+                    AnsiConsole.MarkupLine($"{playerName} deal [blue]{playerDmg}[/] damage to the {enemyName}.");
+                }
+
+                var enemyDmg = Enemy.DealDamage();
+                Player.ReceiveDamage(enemyDmg);
+                AnsiConsole.MarkupLine($"The {enemyName} deals [blue]{enemyDmg}[/] to {playerName}.");
+                DisplayStats();
             }
 
-            var enemyDmg = _enemy.DealDamage();
-            _player.ReceiveDamage(enemyDmg);
-            Console.WriteLine($"The {enemyName} deals {enemyDmg} to you.");
-            DisplayStats();
+            Resolved = true;
+            DisplayWinner();
         }
-
-        Resolved = true;
-        DisplayWinner();
+        else
+        {
+            Console.WriteLine("Error: Player or Enemy does not exist");
+        }
     }
 
     private void DisplayWinner()
     {
-        var winner = _player.IsAlive() ? "player" : "enemy";
+        var winner = Player.IsAlive() ? "player" : "enemy";
         var msg = winner switch
         {
-            "player" => $"You have defeated the {_enemy.Name}!",
-            _ => $"You have been defeated by the {_enemy.Name}. You have failed!"
+            "player" => $"You have defeated the {Enemy.Name}!",
+            _ => $"You have been defeated by the {Enemy.Name}. You have failed!"
         };
         Console.WriteLine(msg);
     }
@@ -48,7 +57,7 @@ public class Combat : IPlayerInteraction
     {
         var tildes = new string('~', 30);
         var msg =
-            $"\n{tildes}\nYour health: {_player.CurrentHealth}\n{_enemy.Name} health: {_enemy.CurrentHealth}\n{tildes}\n";
+            $"\n{tildes}\nYour health: {Player.CurrentHealth}\n{Enemy.Name} health: {Enemy.CurrentHealth}\n{tildes}\n";
         Console.WriteLine(msg);
     }
 }

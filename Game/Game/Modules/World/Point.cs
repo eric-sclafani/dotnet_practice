@@ -19,6 +19,12 @@ public class Point
     {
         return $"({X}, {Y})";
     }
+
+    public bool IsEqualTo(Point point)
+    {
+        return X == point.X && Y == point.Y;
+    }
+    
     
     
     

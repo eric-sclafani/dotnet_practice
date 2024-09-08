@@ -9,11 +9,13 @@ internal class Program
     private static void Main(string[] args)
     {
         // move to title screen eventually
-        const int rows = 8;
-        const int cols = 7;
+        const int rows = 4;
+        const int cols = 5;
+        const int thres = 6;
 
+        
         Player player = new("Eric", 30, 1, 8);
-        World world = new(rows, cols);
+        World world = new(rows, cols, thres, player);
 
         world.DisplayGrid();
         

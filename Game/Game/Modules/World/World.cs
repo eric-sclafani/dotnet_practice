@@ -1,20 +1,24 @@
+using Game.Models;
 using Game.Modules.PlayerInteraction;
 
 namespace Game.Modules.World;
 
 public class World
 {
+    private readonly Player _player;
+
     private readonly int _rows;
     private readonly int _cols;
     private readonly Point[,] _grid;
-    private int _pointInteractionThreshold;
+    private readonly int _pointInteractionThreshold;
     private Point _playerPosition { get; set; }
 
-    public World(int rows, int cols, int thres = 6)
+    public World(int rows, int cols, int thres, Player player)
     {
         _rows = rows;
         _cols = cols;
         _pointInteractionThreshold = thres;
+        _player = player;
 
         _grid = InitGrid();
         _playerPosition = SetPlayerStartPosition();
@@ -28,6 +32,18 @@ public class World
             var newX = _playerPosition.X + newPos.x;
             var newY = _playerPosition.Y + newPos.y;
             _playerPosition = _grid[newX, newY];
+
+            var combat = _playerPosition.Combat;
+            
+            DisplayGrid();
+            if (combat is not null && !combat.Resolved)
+            {
+                var enemy = new Enemy("Test Goblin", 10, 2, 5);
+                combat.Player = _player;
+                combat.Enemy = enemy;
+                combat.Begin();
+            }
+
             return true;
         }
         catch
@@ -46,13 +62,13 @@ public class World
             {
                 var point = _grid[row, col];
 
-                if (point.Combat is not null && point == _playerPosition)
+                if (point.Combat is not null && point.IsEqualTo(_playerPosition))
                 {
                     Console.BackgroundColor = ConsoleColor.DarkCyan;
                     Console.ForegroundColor = ConsoleColor.Red;
                 }
 
-                else if (point == _playerPosition)
+                else if (point.IsEqualTo(_playerPosition))
                 {
                     Console.BackgroundColor = ConsoleColor.DarkCyan;
                 }
@@ -77,7 +93,7 @@ public class World
         {
             Point point = new(row, col);
 
-            if (PointGetsCombat())
+            if (PointGetsCombat() && !point.IsEqualTo(SetPlayerStartPosition()))
             {
                 point.Combat = new Combat();
             }
@@ -92,9 +108,11 @@ public class World
     {
         var x = _rows - 1;
         var y = (int)decimal.Round(_cols / 2);
-        return _grid[x, y];
+        return new Point(x, y);
     }
 
+
+    // TODO: look into letting users navigate using arrow keys
     private static (int x, int y) GetNewCoord(string input)
     {
         (int x, int y) newPos = input switch
