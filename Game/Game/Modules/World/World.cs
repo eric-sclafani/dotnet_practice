@@ -32,10 +32,11 @@ public class World
             var newX = _playerPosition.X + newPos.x;
             var newY = _playerPosition.Y + newPos.y;
             _playerPosition = _grid[newX, newY];
+            DisplayGrid();
 
             var combat = _playerPosition.Combat;
-            
-            DisplayGrid();
+
+
             if (combat is not null && !combat.Resolved)
             {
                 var enemy = new Enemy("Test Goblin", 10, 2, 5);
@@ -92,11 +93,11 @@ public class World
         for (var col = 0; col < _cols; col++)
         {
             Point point = new(row, col);
-
-            if (PointGetsCombat() && !point.IsEqualTo(SetPlayerStartPosition()))
-            {
-                point.Combat = new Combat();
-            }
+            //
+            // if (PointGetsCombat() && !point.IsEqualTo(SetPlayerStartPosition()))
+            // {
+            //     point.Combat = new Combat();
+            // }
 
             grid[row, col] = point;
         }
@@ -115,16 +116,25 @@ public class World
     // TODO: look into letting users navigate using arrow keys
     private static (int x, int y) GetNewCoord(string input)
     {
+        // (int x, int y) newPos = input switch
+        // {
+        //     "n" => (-1, 0),
+        //     "s" => (1, 0),
+        //     "e" => (0, 1),
+        //     "w" => (0, -1),
+        //     "ne" => (-1, 1),
+        //     "nw" => (-1, -1),
+        //     "se" => (1, -1),
+        //     "sw" => (1, 1),
+        //     _ => (0, 0)
+        // };
+        // return newPos;
         (int x, int y) newPos = input switch
         {
-            "n" => (-1, 0),
-            "s" => (1, 0),
-            "e" => (0, 1),
-            "w" => (0, -1),
-            "ne" => (-1, 1),
-            "nw" => (-1, -1),
-            "se" => (1, -1),
-            "sw" => (1, 1),
+            "UpArrow" => (-1, 0),
+            "DownArrow" => (1, 0),
+            "RightArrow" => (0, 1),
+            "LeftArrow" => (0, -1),
             _ => (0, 0)
         };
         return newPos;

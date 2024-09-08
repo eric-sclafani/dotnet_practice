@@ -1,6 +1,6 @@
 using Game.Modules.PlayerInteraction;
 
-namespace Game.Modules.World;
+namespace Game.Models;
 
 public class Point
 {
