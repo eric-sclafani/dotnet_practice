@@ -2,9 +2,6 @@ namespace Game.Models;
 
 public class Player : Character
 {
-    // TODO: determines whether to display combat help text (?)
-    public bool IsFirstCombat { get; set; }
-    
     public Player(string name, int maxHealth, int minDmg, int maxDmg) : base(name, maxHealth, minDmg, maxDmg)
     {
     }

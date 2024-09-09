@@ -37,6 +37,7 @@ public static class Output
 
     public static void DisplayGrid(Point[,] grid, Point playerPosition)
     {
+        Console.Clear();
         var rows = grid.GetLength(0);
         var cols = grid.GetLength(1);
         

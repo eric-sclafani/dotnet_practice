@@ -1,4 +1,5 @@
 using Game.Models;
+using Game.Modules.ConsoleIO;
 using Game.Modules.Interaction;
 
 namespace Game.Modules.World;
@@ -33,9 +34,9 @@ public class World
             var newX = PlayerPosition.X + newPos.x;
             var newY = PlayerPosition.Y + newPos.y;
             PlayerPosition = Grid[newX, newY];
-
+            Output.DisplayGrid(Grid, PlayerPosition);
+            
             var combat = PlayerPosition.Combat;
-
             if (combat is not null && !combat.Resolved)
             {
                 var enemy = new Enemy("Testie the Test Goblin", 10, 2, 5);
@@ -64,7 +65,7 @@ public class World
 
             grid[row, col] = point;
         }
-
+        
         return grid;
     }
 
