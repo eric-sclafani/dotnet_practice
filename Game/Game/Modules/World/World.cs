@@ -1,5 +1,5 @@
 using Game.Models;
-using Game.Modules.PlayerInteraction;
+using Game.Modules.Interaction;
 
 namespace Game.Modules.World;
 
@@ -9,9 +9,10 @@ public class World
 
     private readonly int _rows;
     private readonly int _cols;
-    private readonly Point[,] _grid;
     private readonly int _pointInteractionThreshold;
-    private Point _playerPosition { get; set; }
+
+    public readonly Point[,] Grid;
+    public Point PlayerPosition { get; private set; }
 
     public World(int rows, int cols, int thres, Player player)
     {
@@ -20,8 +21,8 @@ public class World
         _pointInteractionThreshold = thres;
         _player = player;
 
-        _grid = InitGrid();
-        _playerPosition = SetPlayerStartPosition();
+        Grid = InitGrid();
+        PlayerPosition = SetPlayerStartPosition();
     }
 
     public void ChangePlayerPosition(string? playerInput)
@@ -29,16 +30,15 @@ public class World
         var newPos = GetNewCoord(playerInput);
         try
         {
-            var newX = _playerPosition.X + newPos.x;
-            var newY = _playerPosition.Y + newPos.y;
-            _playerPosition = _grid[newX, newY];
-            DisplayGrid();
+            var newX = PlayerPosition.X + newPos.x;
+            var newY = PlayerPosition.Y + newPos.y;
+            PlayerPosition = Grid[newX, newY];
 
-            var combat = _playerPosition.Combat;
+            var combat = PlayerPosition.Combat;
 
             if (combat is not null && !combat.Resolved)
             {
-                var enemy = new Enemy("Test Goblin", 10, 2, 5);
+                var enemy = new Enemy("Testie the Test Goblin", 10, 2, 5);
                 combat.Player = _player;
                 combat.Enemy = enemy;
                 combat.Begin();
@@ -46,39 +46,6 @@ public class World
         }
         catch
         {
-            Console.WriteLine("You have reached the end of the map and cannot go that way.");
-        }
-    }
-
-    public void DisplayGrid()
-    {
-        Console.Clear();
-        for (var row = 0; row < _rows; row++)
-        {
-            for (var col = 0; col < _cols; col++)
-            {
-                var point = _grid[row, col];
-
-                if (point.Combat is not null && !point.Combat.Resolved && point.IsEqualTo(_playerPosition))
-                {
-                    Console.BackgroundColor = ConsoleColor.DarkCyan;
-                    Console.ForegroundColor = ConsoleColor.Red;
-                }
-
-                else if (point.IsEqualTo(_playerPosition))
-                {
-                    Console.BackgroundColor = ConsoleColor.DarkCyan;
-                }
-                else if (point.Combat is not null && !point.Combat.Resolved)
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                }
-
-                Console.Write(point);
-                Console.ResetColor();
-            }
-
-            Console.Write("\n");
         }
     }
 

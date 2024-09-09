@@ -9,6 +9,11 @@ public class Player : Character
     {
     }
 
+    public override string ToString()
+    {
+        return $"[green]{Name}[/]";
+    }
+
     public static string? playerInput()
     {
         var input = Console.ReadLine()?.Trim().ToLower();

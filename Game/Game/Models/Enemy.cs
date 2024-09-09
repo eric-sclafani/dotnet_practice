@@ -6,5 +6,10 @@ public class Enemy : Character
     {
         
     }
+    
+    public override string ToString()
+    {
+        return $"[red]{Name}[/]";
+    }
 }
 

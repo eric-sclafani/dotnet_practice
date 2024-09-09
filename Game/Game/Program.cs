@@ -1,12 +1,12 @@
 ﻿using Game.Models;
+using Game.Modules.ConsoleIO;
 using Game.Modules.World;
-using Game.Modules.PlayerInput;
 
 namespace Game;
 
 internal class Program
 {
-    private static void Main(string[] args)
+    private static void Main()
     {
         // move to title screen eventually
         const int rows = 4;
@@ -20,7 +20,7 @@ internal class Program
         var playerInput = "";
         while (playerInput != "exit" && player.IsAlive())
         {
-            world.DisplayGrid();
+            Output.DisplayGrid(world.Grid, world.PlayerPosition);
             Console.WriteLine("Where would you like to go?");
             playerInput = Input.GetDirection();
 

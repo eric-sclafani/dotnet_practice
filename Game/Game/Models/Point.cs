@@ -1,3 +1,4 @@
+using Game.Modules.Interaction;
 using Game.Modules.PlayerInteraction;
 
 namespace Game.Models;

@@ -1,6 +1,6 @@
-namespace Game.Modules.PlayerInput;
-
 using Spectre.Console;
+
+namespace Game.Modules.ConsoleIO;
 
 public static class Input
 {

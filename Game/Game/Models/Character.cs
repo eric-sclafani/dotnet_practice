@@ -29,6 +29,7 @@ public class Character
         CurrentHealth = amount <= 0 ? 0 : amount;
     }
 
+    // TODO: add accuracy system, chance to miss attack
     public int DealDamage()
     {
         var r = new Random();
